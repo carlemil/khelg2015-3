@@ -1,7 +1,8 @@
 package com.jayway.waytravel;
 
-import android.support.v4.app.FragmentActivity;
+import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -9,10 +10,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.jayway.waytravel.dto.PersonDTO;
+import com.jayway.waytravel.dto.PersonsDTO;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+
+    Gson gson = new Gson();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +44,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        PersonsDTO persons = gson.fromJson(MockData.data, PersonsDTO.class);
+
+        RectF r = new RectF(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+
+        for (PersonDTO p : persons.persons) {
+            LatLng latlan = new LatLng(p.latitude, p.longitude);
+            mMap.addMarker(new MarkerOptions().position(latlan).title(p.title));
+            if (p.latitude < r.top) {
+                r.top = p.latitude;
+            }
+            if (p.latitude > r.bottom) {
+                r.top = p.latitude;
+            }
+            if (p.longitude < r.right) {
+                r.right = p.longitude;
+            }
+            if (p.longitude > r.left) {
+                r.left = p.longitude;
+            }
+        }
+
+        LatLng center = new LatLng((r.top + r.bottom) / 2, (r.left + r.right) / 2);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
     }
 }
