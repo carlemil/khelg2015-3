@@ -17,11 +17,11 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                Fragment tab1 = new MainMapFragment();
-                return tab1;
-            case 1:
                 EventFragment tab2 = new EventFragment();
                 return tab2;
+            case 1:
+                Fragment tab1 = new MainMapFragment();
+                return tab1;
 
             default:
                 return null;

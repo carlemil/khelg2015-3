@@ -13,8 +13,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Group map"));
-        tabLayout.addTab(tabLayout.newTab().setText("Event list"));
+        tabLayout.addTab(tabLayout.newTab().setText("UPCOMING"));
+        tabLayout.addTab(tabLayout.newTab().setText("PEOPLE"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
