@@ -4,7 +4,11 @@ package com.jayway.waytravel;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,6 +28,7 @@ import java.io.IOException;
 public class EventFragment extends ListFragment {
     Gson gson = new Gson();
     private EventsDTO events;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,26 @@ public class EventFragment extends ListFragment {
 
         // initialize and set the list adapter
         setListAdapter(new EventsAdapter(getActivity()));
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_event,
+                container, false);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(true);
+
+                Handler handler = new Handler();
+                handler.post(invokeGetJob(handler));
+            }
+        });
+
+        return view;
     }
 
     @Override
@@ -64,7 +89,7 @@ public class EventFragment extends ListFragment {
                 client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Request request, IOException e) {
-
+                        Log.d("Test", "FAIL");
                     }
 
                     @Override
@@ -77,6 +102,8 @@ public class EventFragment extends ListFragment {
                             public void run() {
                                 ((EventsAdapter) getListAdapter()).setEvents(events);
                                 ((EventsAdapter) getListAdapter()).notifyDataSetChanged();
+
+                                swipeRefreshLayout.setRefreshing(false);
                             }
                         });
                     }
