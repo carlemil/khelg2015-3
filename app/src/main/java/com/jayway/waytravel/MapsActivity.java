@@ -1,7 +1,6 @@
 package com.jayway.waytravel;
 
 import android.content.Context;
-import android.graphics.RectF;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -88,11 +87,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (!flag) {
                 flag = true;
 
-                icon = new MarkerOptions().position(latlan).title(p.title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
             }
 
             else {
-                icon = new MarkerOptions().position(latlan).title(p.title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             }
 
         }
