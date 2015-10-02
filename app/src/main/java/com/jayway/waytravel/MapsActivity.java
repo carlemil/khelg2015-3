@@ -1,6 +1,10 @@
 package com.jayway.waytravel;
 
+import android.content.Context;
 import android.graphics.RectF;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
@@ -19,6 +23,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     Gson gson = new Gson();
+    private double longitude = Double.NaN;
+    private double latitude = Double.NaN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +34,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        longitude = location.getLongitude();
+        latitude = location.getLatitude();
     }
+
+    private final LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+        }
+    };
 
 
     /**
@@ -72,8 +105,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         System.out.println("---\n" + r);
 
         System.out.println(center);
-        center = new LatLng(persons.persons.get(0).latitude, persons.persons.get(0).longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        if (latitude != Double.NaN && longitude != Double.NaN) {
+            center = new LatLng(latitude, longitude);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        }
     }
 }
