@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.jayway.waytravel.dto.EventDTO;
 import com.jayway.waytravel.dto.EventsDTO;
+import com.jayway.waytravel.dto.ParticipantDTO;
 
 /**
  * Created by carlemil on 2015-10-02.
@@ -50,7 +51,14 @@ public class EventsAdapter extends BaseAdapter {
         EventDTO item = getItem(position);
         viewHolder.title.setText(item.title);
         viewHolder.description.setText(item.description);
-        viewHolder.participants.setText("");//item.participants.size()+"");
+        StringBuffer sb = new StringBuffer();
+        if(item.participants!=null) {
+            for (ParticipantDTO p:item.participants) {
+                sb.append(p.name);
+                sb.append(", ");
+            }
+            viewHolder.participants.setText(sb.toString());//item.participants.size()+"");
+        }
 
         return convertView;
     }
