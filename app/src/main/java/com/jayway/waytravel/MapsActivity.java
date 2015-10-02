@@ -32,9 +32,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 	Gson gson = new Gson();
 	private GoogleMap mMap;
-	private double longitude = Double.NaN;
-	private double latitude  = Double.NaN;
-	private LocationManager lm;
+	private       double           longitude        = Double.NaN;
+	private       double           latitude         = Double.NaN;
+	private LocationManager mLm;
 	private final LocationListener locationListener = new LocationListener() {
 		@Override
 		public void onLocationChanged(Location location) {
@@ -47,7 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 			center = new LatLng(latitude, longitude);
 			mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
 			mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-			lm.removeUpdates(this);
+			mLm.removeUpdates(this);
 		}
 
 		@Override
@@ -66,17 +66,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		mLm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
 		setContentView(R.layout.activity_maps);
 		// Obtain the SupportMapFragment and get notified when the map is ready to be used.
 		SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 		mapFragment.getMapAsync(this);
-
-		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
-
-		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		longitude = location.getLongitude();
-		latitude = location.getLatitude();
 	}
 
 	/**
@@ -92,34 +88,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	public void onMapReady(GoogleMap googleMap) {
 		mMap = googleMap;
 
+		mLm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+
 		final android.os.Handler handler = new android.os.Handler();
 		handler.post(createJob(handler));
-
-		PinsDTO persons = gson.fromJson(MockData.data, PinsDTO.class);
-
-		for (PinDTO p : persons.persons) {
-			LatLng latlan = new LatLng(p.latitude, p.longitude);
-
-			MarkerOptions icon;
-			boolean flag = false;
-			if (!flag) {
-				flag = true;
-
-				icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-			}
-
-			else {
-				icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-			}
-
-			mMap.addMarker(icon);
-		}
-
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
-		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
-		mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
-		mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
 	}
 
 	@NonNull
@@ -129,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 			public void run() {
 				OkHttpClient client = new OkHttpClient();
 
-				final Request request = new Request.Builder().url("http://travelway-server.herokuapp.com/users").build();
+				final Request request = new Request.Builder().addHeader("Accept", "application/json").url("http://travelway-server.herokuapp.com/users").build();
 
 				client.newCall(request).enqueue(new Callback() {
 					@Override
@@ -138,11 +110,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 					}
 
 					@Override
-					public void onResponse(Response response) throws IOException {
+					public void onResponse(final Response response) throws IOException {
 
-						mMap.clear();
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								PinsDTO persons = null;
+								try {
+									persons = gson.fromJson("{\"pins\":" + response.body().string() + "}", PinsDTO.class);
+								}
+								catch (IOException e) {
+									e.printStackTrace();
+								}
 
-						handler.postDelayed(createJob(handler), 10 * 1000);
+								mMap.clear();
+
+								boolean flag = false;
+
+								for (PinDTO p : persons.pins) {
+									LatLng latlan = new LatLng(p.latitude, p.longitude);
+
+									MarkerOptions icon;
+
+									if (!flag) {
+										flag = true;
+
+										icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+									}
+
+									else {
+										icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+									}
+
+									mMap.addMarker(icon);
+								}
+
+								handler.postDelayed(createJob(handler), 10 * 1000);
+							}
+						});
 					}
 				});
 			}
