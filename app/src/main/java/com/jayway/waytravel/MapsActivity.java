@@ -12,11 +12,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
-import com.jayway.waytravel.dto.PersonDTO;
-import com.jayway.waytravel.dto.PersonsDTO;
+import com.jayway.waytravel.dto.PinDTO;
+import com.jayway.waytravel.dto.PinsDTO;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -77,38 +78,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        PersonsDTO persons = gson.fromJson(MockData.data, PersonsDTO.class);
+        PinsDTO persons = gson.fromJson(MockData.data, PinsDTO.class);
 
-        RectF r = new RectF(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-
-        for (PersonDTO p : persons.persons) {
+        for (PinDTO p : persons.persons) {
             LatLng latlan = new LatLng(p.latitude, p.longitude);
-            mMap.addMarker(new MarkerOptions().position(latlan).title(p.title));
-            if (p.latitude < r.top) {
-                r.top = p.latitude;
-            }
-            if (p.latitude > r.bottom) {
-                r.top = p.latitude;
-            }
-            if (p.longitude < r.right) {
-                r.right = p.longitude;
-            }
-            if (p.longitude > r.left) {
-                r.left = p.longitude;
-            }
-            System.out.println(r);
 
-            System.out.println(p);
+            MarkerOptions icon;
+            boolean flag =false;
+            if (!flag) {
+                flag = true;
+
+                icon = new MarkerOptions().position(latlan).title(p.title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+            }
+
+            else {
+                icon = new MarkerOptions().position(latlan).title(p.title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            }
+
         }
 
-        LatLng center = new LatLng((r.top + r.bottom) / 2, (r.left + r.right) / 2);
-        System.out.println("---\n" + r);
-
-        System.out.println(center);
         if (latitude != Double.NaN && longitude != Double.NaN) {
+            LatLng center;
             center = new LatLng(latitude, longitude);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
         }
     }
+
 }
