@@ -7,13 +7,13 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
@@ -37,9 +37,6 @@ public class MainMapFragment extends MapFragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private LocationManager mLm;
 
-    private boolean mHasCentered;
-
-
     private double mLongitude;
     private double mLatitude;
     private final LocationListener locationListener = new LocationListener() {
@@ -48,18 +45,9 @@ public class MainMapFragment extends MapFragment implements OnMapReadyCallback {
             mLongitude = location.getLongitude();
             mLatitude = location.getLatitude();
 
-            Log.d("TAG", "saker");
-
-            if (!mHasCentered) {
-                mHasCentered = true;
-
-                LatLng center;
-                center = new LatLng(mLatitude, mLongitude);
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-            }
-
             invokePostJob();
+
+            mLm.removeUpdates(locationListener);
         }
 
         @Override
@@ -78,12 +66,10 @@ public class MainMapFragment extends MapFragment implements OnMapReadyCallback {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
-        getMapAsync(this);
         mLm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-    }
 
+        getMapAsync(this);
+    }
 
 
     /**
@@ -100,6 +86,15 @@ public class MainMapFragment extends MapFragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         mLm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+
+        Location lastKnownLocation = mLm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        mLatitude = lastKnownLocation.getLatitude();
+        mLongitude = lastKnownLocation.getLongitude();
+
+        LatLng center;
+        center = new LatLng(mLatitude, mLongitude);
+
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(center).zoom(12).build()));
 
         final android.os.Handler handler = new android.os.Handler();
         handler.post(invokeGetJob(handler));

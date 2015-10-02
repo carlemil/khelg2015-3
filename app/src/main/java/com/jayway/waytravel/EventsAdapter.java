@@ -36,7 +36,7 @@ public class EventsAdapter extends ArrayAdapter<EventDTO> {
 
             // initialize the view holder
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.event_name);
+            viewHolder.title = (TextView) convertView.findViewById(R.id.event_title);
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
