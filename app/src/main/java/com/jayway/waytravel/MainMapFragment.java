@@ -7,17 +7,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -89,7 +84,7 @@ public class MainMapFragment extends MapFragment implements OnMapReadyCallback {
         mLm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
 
-    
+
 
     /**
      * Manipulates the map once available.
@@ -163,7 +158,7 @@ public class MainMapFragment extends MapFragment implements OnMapReadyCallback {
                                 PinsDTO persons = null;
                                 try {
                                     persons = gson.fromJson("{\"pins\":" + response.body().string() + "}", PinsDTO.class);
-
+                                    response.body().close();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
