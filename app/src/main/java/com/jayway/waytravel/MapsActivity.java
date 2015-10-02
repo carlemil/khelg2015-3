@@ -50,9 +50,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 		RectF r = new RectF(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
+		boolean flag =false;
+
 		for (PinDTO p : persons.persons) {
+
 			LatLng latlan = new LatLng(p.latitude, p.longitude);
-			mMap.addMarker(new MarkerOptions().position(latlan).title(p.title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+			MarkerOptions icon;
+
+			if (!flag) {
+				flag = true;
+
+				icon = new MarkerOptions().position(latlan).title(p.title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+			}
+
+			else {
+				icon = new MarkerOptions().position(latlan).title(p.title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+			}
+
+			mMap.addMarker(icon);
 			if (p.latitude < r.top) {
 				r.top = p.latitude;
 			}
