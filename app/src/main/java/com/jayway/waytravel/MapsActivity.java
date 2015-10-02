@@ -63,9 +63,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (p.longitude > r.left) {
                 r.left = p.longitude;
             }
+            System.out.println(r);
+
+            System.out.println(p);
         }
 
         LatLng center = new LatLng((r.top + r.bottom) / 2, (r.left + r.right) / 2);
+        System.out.println("---\n" + r);
+
+        System.out.println(center);
+        center = new LatLng(persons.persons.get(0).latitude, persons.persons.get(0).longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
     }
 }
