@@ -4,7 +4,6 @@ package com.jayway.waytravel;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -33,31 +32,26 @@ public class EventFragment extends ListFragment {
         final android.os.Handler handler = new android.os.Handler();
         handler.post(invokeGetJob(handler));
 
-            // initialize and set the list adapter
-            setListAdapter(new EventsAdapter(getActivity(), 0));
-        }
+        // initialize and set the list adapter
+        setListAdapter(new EventsAdapter(getActivity()));
+    }
 
-        @Override
-        public void onViewCreated(View view, Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-            // remove the dividers from the ListView of the ListFragment
-            getListView().setDivider(null);
-        }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // remove the dividers from the ListView of the ListFragment
+        getListView().setDivider(null);
+    }
 
-        @Override
-        public void onListItemClick(ListView l, View v, int position, long id) {
-            // retrieve theListView item
-            EventDTO item = events.events.get(position);
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        // retrieve theListView item
+        EventDTO item = events.events.get(position);
 
-            // do something
-            Toast.makeText(getActivity(), item.title, Toast.LENGTH_SHORT).show();
-        }
+        // do something
+        Toast.makeText(getActivity(), item.title, Toast.LENGTH_SHORT).show();
+    }
 
-//    @Nullable
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.tab_fragment2, null);
-//    }
 
     public Runnable invokeGetJob(final Handler handler) {
         return new Runnable() {
@@ -75,9 +69,16 @@ public class EventFragment extends ListFragment {
 
                     @Override
                     public void onResponse(final Response response) throws IOException {
-                         events = gson.fromJson("{\"events\":" + response.body().string() + "}", EventsDTO.class);
+                        events = gson.fromJson("{\"events\":" + response.body().string() + "}", EventsDTO.class);
                         //Log.d("TAG", "response: " + response.body().string());
                         response.body().close();
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((EventsAdapter) getListAdapter()).setEvents(events);
+                                ((EventsAdapter) getListAdapter()).notifyDataSetChanged();
+                            }
+                        });
                     }
                 });
             }
