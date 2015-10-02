@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -35,7 +36,7 @@ import java.io.IOException;
 /**
  * Created by carlemil on 2015-10-02.
  */
-public class MainMapFragment extends Fragment implements OnMapReadyCallback {
+public class MainMapFragment extends MapFragment implements OnMapReadyCallback {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     Gson gson = new Gson();
     private GoogleMap mMap;
@@ -82,15 +83,13 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+//        SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
+        getMapAsync(this);
         mLm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.tab_fragment1, container, false);
-    }
+    
 
     /**
      * Manipulates the map once available.

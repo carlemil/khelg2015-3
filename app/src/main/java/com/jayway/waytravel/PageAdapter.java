@@ -1,8 +1,8 @@
 package com.jayway.waytravel;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.support.v13.app.FragmentStatePagerAdapter;
 
 public class PageAdapter extends FragmentStatePagerAdapter {
     int mNumOfTabs;
@@ -17,7 +17,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                MainMapFragment tab1 = new MainMapFragment();
+                Fragment tab1 = new MainMapFragment();
                 return tab1;
             case 1:
                 EventFragment tab2 = new EventFragment();

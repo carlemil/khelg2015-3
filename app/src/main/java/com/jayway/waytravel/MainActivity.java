@@ -1,11 +1,11 @@
 package com.jayway.waytravel;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +19,7 @@ public class MainActivity extends FragmentActivity {
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         final PageAdapter adapter = new PageAdapter
-                (getSupportFragmentManager(), tabLayout.getTabCount());
+                (getFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
