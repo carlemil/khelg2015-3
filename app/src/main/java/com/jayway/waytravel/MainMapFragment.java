@@ -7,8 +7,11 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +32,10 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+/**
+ * Created by carlemil on 2015-10-02.
+ */
+public class MainMapFragment extends Fragment implements OnMapReadyCallback {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     Gson gson = new Gson();
     private GoogleMap mMap;
@@ -74,15 +80,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mLm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        mLm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.tab_fragment1, container, false);
     }
 
     /**
@@ -103,6 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final android.os.Handler handler = new android.os.Handler();
         handler.post(invokeGetJob(handler));
     }
+
 
     @NonNull
     private Runnable invokePostJob() {
@@ -190,8 +198,3 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
     }
 }
-
-
-
-
-
