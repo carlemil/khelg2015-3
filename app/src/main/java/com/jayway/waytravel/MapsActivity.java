@@ -83,11 +83,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         PinsDTO persons = gson.fromJson(MockData.data, PinsDTO.class);
 
+        boolean flag = false;
         for (PinDTO p : persons.persons) {
             LatLng latlan = new LatLng(p.latitude, p.longitude);
 
             MarkerOptions icon;
-            boolean flag = false;
             if (!flag) {
                 flag = true;
 
