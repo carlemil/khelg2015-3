@@ -5,6 +5,6 @@ import java.util.List;
 /**
  * Created by carlemil on 2015-10-02.
  */
-public class PersonsDTO {
-    public List<PersonDTO> persons;
+public class PinsDTO {
+    public List<PinDTO> persons;
 }
