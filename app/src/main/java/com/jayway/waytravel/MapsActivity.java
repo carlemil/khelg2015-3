@@ -6,6 +6,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,8 +24,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     Gson gson = new Gson();
-    private double longitude = Double.NaN;
-    private double latitude = Double.NaN;
+    private LocationManager lm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,19 +35,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        longitude = location.getLongitude();
-        latitude = location.getLatitude();
     }
 
     private final LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+
+            Log.d("TAG", "saker");
+
+            LatLng center;
+            center = new LatLng(latitude, longitude);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+            lm.removeUpdates(this);
         }
 
         @Override
@@ -83,25 +87,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng latlan = new LatLng(p.latitude, p.longitude);
 
             MarkerOptions icon;
-            boolean flag =false;
+            boolean flag = false;
             if (!flag) {
                 flag = true;
 
                 icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
-            }
-
-            else {
+            } else {
                 icon = new MarkerOptions().position(latlan).title(p.name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             }
-
+            mMap.addMarker(icon);
         }
 
-        if (latitude != Double.NaN && longitude != Double.NaN) {
-            LatLng center;
-            center = new LatLng(latitude, longitude);
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        LatLng center = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
     }
 
 }
